@@ -150,3 +150,6 @@ kiro/specs
     ├── requirements.md
     └── spec.json
 ```
+
+### spec-degign
+

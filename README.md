@@ -1,0 +1,3 @@
+# engineer-omikuji
+
+おみくじだよ！

@@ -3,19 +3,19 @@
 ## 概要
 
 ### 調査範囲
-トップページの技術設計において、Next.js 14のパフォーマンス最適化、Framer Motionによるアニメーション実装、WCAGアクセシビリティ要件への準拠について包括的な調査を実施した。
+トップページの技術設計において、Next.js 16のパフォーマンス最適化、Framer Motionによるアニメーション実装、WCAGアクセシビリティ要件への準拠について包括的な調査を実施した。
 
 ### 主要な発見事項
-1. **Next.js 14のServer Components First Approach**が最適なパフォーマンスを実現
+1. **Next.js 16のServer Components First Approach**が最適なパフォーマンスを実現
 2. **Framer Motionの最新API**でハードウェアアクセラレーションを活用可能
 3. **96.8%のWebサイトがWCAG非準拠**という現状を踏まえ、アクセシビリティを最初から考慮した設計が重要
 
 ## 調査ログ
 
-### 1. Next.js 14パフォーマンス最適化
+### 1. Next.js 16パフォーマンス最適化
 
 #### 調査内容
-Next.js 14 App Routerにおけるランディングページのベストプラクティスを調査。
+Next.js 16 App Routerにおけるランディングページのベストプラクティスを調査。
 
 #### 情報源
 - Next.js公式ドキュメント
@@ -44,7 +44,7 @@ Next.js 14 App Routerにおけるランディングページのベストプラ�
 ### 2. Framer Motionアニメーション戦略
 
 #### 調査内容
-Next.js 14環境でのFramer Motionの最適な実装パターンを調査。
+Next.js 16環境でのFramer Motionの最適な実装パターンを調査。
 
 #### 情報源
 - Motion公式ドキュメント（2024年最新版）

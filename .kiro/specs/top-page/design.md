@@ -39,7 +39,7 @@ src/app/page.tsx (Server Component)
 ### フロントエンド技術選定
 | 技術 | 用途 | 選定理由 |
 |------|------|----------|
-| Next.js 14 App Router | フレームワーク | Server Components対応、高速な初期表示 |
+| Next.js 16 App Router | フレームワーク | Server Components対応、高速な初期表示 |
 | TypeScript 5.x | 言語 | 型安全性の確保、DDD実装支援 |
 | Tailwind CSS | スタイリング | ユーティリティファースト、高速開発 |
 | Framer Motion | アニメーション | 高パフォーマンス、宣言的API |

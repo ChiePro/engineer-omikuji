@@ -114,8 +114,8 @@ sequenceDiagram
     Server-->>Browser: HTML + CSS (初期表示)
     Browser->>User: ファーストビュー表示 (< 3秒)
 
-    Note over Browser: Client Componentの水和
-    Browser->>Browser: OmikujiCard水和
+    Note over Browser: Client Componentのインタラクティブ機能初期化
+    Browser->>Browser: OmikujiCardのインタラクティブ機能初期化
     Browser->>User: インタラクティブ機能有効化
 
     User->>Browser: おみくじカードホバー
@@ -128,7 +128,7 @@ sequenceDiagram
 
 **Key Decisions**:
 - Server Componentによる初期HTMLレンダリングで3秒以内のファーストビュー達成（Requirement 5.1）
-- Client Componentの水和はファーストビュー後に非同期実行し、初期表示をブロックしない
+- Client Componentのインタラクティブ機能初期化はファーストビュー後に非同期実行し、初期表示をブロックしない
 - `next/link`によるプリフェッチとクライアントサイドナビゲーションでシームレスな遷移
 
 ### ナビゲーションフロー
@@ -424,7 +424,7 @@ type GetOmikujiListResponse = {
 
 ### Performance/Load
 1. **SSRレンダリング時間** - おみくじ数が増加した場合のSSRパフォーマンス（50件まで想定）
-2. **Client Component水和時間** - OmikujiCardの水和がファーストビューをブロックしないか
+2. **Client Componentインタラクティブ機能初期化時間** - OmikujiCardのインタラクティブ機能初期化がファーストビューをブロックしないか
 3. **Core Web Vitals** - LCP < 2.5s、FID < 100ms、CLS < 0.1を満たすか
 
 ## Optional Sections

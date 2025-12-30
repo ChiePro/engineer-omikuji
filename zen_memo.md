@@ -141,7 +141,6 @@ _Focus on patterns and purpose, not exhaustive feature lists_
 
 ```
 
-
 成果物
 ```
 kiro/specs                           
@@ -151,5 +150,13 @@ kiro/specs
     └── spec.json
 ```
 
-### spec-degign
+### spec-degign(設計)
+コマンド実行したら調査、設計をやってくれる。
+
+```
+/kiro:spec-design top-page -y
+
+> 水和ってなんですか？より一般的な言葉があるならおきかえてください
+```
+
 

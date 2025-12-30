@@ -86,7 +86,7 @@
 | Option | Description | Strengths | Risks / Limitations | Notes |
 |--------|-------------|-----------|---------------------|-------|
 | Server Component Only | トップページ全体をServer Componentとして実装 | SSRによる高速初期表示、SEO最適化、ゼロJavaScript | インタラクティブ要素（ホバーエフェクト）の実装制約 | Requirement 3.3（ホバーエフェクト）のためClient Component化が必要 |
-| Hybrid (Server + Client) | メインページはServer Component、インタラクティブ部分のみClient Component | パフォーマンスと機能性のバランス、部分的水和 | コンポーネント分割の複雑性 | **選択** - OmikujiCardコンポーネントのみClient Component化 |
+| Hybrid (Server + Client) | メインページはServer Component、インタラクティブ部分のみClient Component | パフォーマンスと機能性のバランス、部分的なインタラクティブ機能初期化 | コンポーネント分割の複雑性 | **選択** - OmikujiCardコンポーネントのみClient Component化 |
 | Client Component Only | トップページ全体をClient Componentとして実装 | 実装がシンプル、全機能がクライアントサイド | JavaScript依存、初期ロード遅延、SEO不利 | steering/tech.mdの「Server Components First」方針に反する |
 
 ## Design Decisions

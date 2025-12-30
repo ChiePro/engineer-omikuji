@@ -289,11 +289,19 @@ interface OmikujiCardProps {
 **Contracts**: Type Definition [x]
 
 ##### Type Definition
+
+> **注意**: このデータモデルは初期実装のための仮のモデルです。将来的な拡張性を考慮し、以下の追加フィールドが検討される可能性があります：
+> - `icon`: おみくじのアイコンパス
+> - `category`: カテゴリ分類（業務、コミュニケーション、技術など）
+> - `difficulty`: 難易度や重要度
+> - `metadata`: 拡張用メタデータ（作成日時、タグ、表示順序など）
+
 ```typescript
 interface Omikuji {
   id: string;          // 一意識別子、URL-safe
   name: string;        // 表示名（例: "今日の運勢"）
   description: string; // 簡潔な説明（50文字程度）
+  // 将来追加される可能性: icon, category, difficulty, metadata
 }
 
 const omikujiList: readonly Omikuji[] = [
@@ -319,11 +327,15 @@ export { type Omikuji, omikujiList };
 
 ### Domain Model
 
+> **設計上の注意**: 以下のデータモデルは初期実装のための最小構成です。将来的にはアイコン、カテゴリ分類、メタデータなどのフィールド追加が想定されます。拡張時には型定義の後方互換性を維持します。
+
 **Aggregates**:
 - **Omikuji**: おみくじの基本情報を表す値オブジェクト（集約ルート）
 
 **Entities & Value Objects**:
 - `Omikuji` - 値オブジェクト（id, name, descriptionで一意に識別）
+  - 現行: 最小限の3フィールド（id, name, description）
+  - 将来想定: icon, category, difficulty, metadata等の追加
 
 **Business Rules**:
 - おみくじIDは一意であり、URL-safeな文字列（英数字、ハイフン、アンダースコアのみ）
@@ -469,12 +481,15 @@ type GetOmikujiListResponse = {
 
 ### 詳細な型定義例
 
+> **注**: このインターフェースは初期実装用の仮のモデルです。将来的にフィールドが追加される可能性があります。
+
 ```typescript
-// lib/omikuji-data.ts の完全な実装例
+// lib/omikuji-data.ts の完全な実装例（初期バージョン）
 export interface Omikuji {
-  id: string;
-  name: string;
-  description: string;
+  id: string;          // 必須: 一意識別子
+  name: string;        // 必須: 表示名
+  description: string; // 必須: 説明文
+  // 将来追加予定: icon?, category?, difficulty?, metadata?
 }
 
 export const omikujiList: readonly Omikuji[] = [

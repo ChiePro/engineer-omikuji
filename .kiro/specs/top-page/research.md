@@ -38,6 +38,7 @@
 
 ### おみくじデータの管理戦略
 - **Context**: おみくじ一覧を表示するためのデータソースと管理方法を決定
+- **重要**: 本セクションで定義するデータモデルは**初期実装のための仮のモデル**です。将来的な拡張性（アイコン、カテゴリ、難易度、メタデータ等）を考慮した設計とします
 - **Alternatives Considered**:
   1. **静的データ（TypeScript定数）** - シンプルで初期実装に適している
   2. **JSONファイル** - 設定ファイルとして管理しやすい
@@ -98,10 +99,11 @@
 
 ### Decision: `おみくじデータの型定義と管理`
 - **Context**: TypeScript strict modeでの型安全性を確保しつつ、将来の拡張性を考慮
+- **重要な前提**: 本決定で定義する`Omikuji`型は初期実装用の最小構成（id, name, description）です。将来的にはicon、category、difficulty、metadata等のフィールド追加を想定しています
 - **Alternatives Considered**:
   1. インラインオブジェクト配列 - 型推論に依存
   2. 明示的な型定義 + データ分離 - 型安全性と拡張性のバランス
-- **Selected Approach**: `Omikuji`型インターフェースを定義し、`lib/omikuji-data.ts`で管理
+- **Selected Approach**: `Omikuji`型インターフェースを定義し、`lib/omikuji-data.ts`で管理（初期は3フィールドのみ、拡張容易な設計）
 - **Rationale**:
   - TypeScript strict modeによる完全な型チェック
   - 将来的なデータソース変更時の型定義再利用

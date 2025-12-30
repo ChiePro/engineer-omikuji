@@ -3,11 +3,18 @@
 ## 技術スタック
 
 ### フロントエンド
-- **フレームワーク**: Next.js 16 (App Router)
+- **フレームワーク**: Next.js 16.1.1 (App Router)
 - **言語**: TypeScript
-- **スタイリング**: Tailwind CSS
-- **アニメーション**: Framer Motion
-- **状態管理**: Zustand（必要に応じて）
+- **ランタイム**: React 19.2.3 (最新版)
+- **スタイリング**: Tailwind CSS 4
+- **アニメーション**: Framer Motion 12.23+
+- **状態管理**: React 19 built-ins + 必要に応じてZustand
+- **パフォーマンス最適化**: Web Vitals監視、React 19並行機能
+
+### 現在のアーキテクチャ決定
+- **統合アプローチ**: 初期実装では個別コンポーネントを単一ページに統合
+- **漸進的分離**: 将来的なページ分割を見越したコンポーネント設計
+- **データフェッチ**: サーバー・クライアント双方でのフォールバック戦略
 
 ### バックエンド
 - **API**: Next.js API Routes
@@ -24,11 +31,11 @@
 - **環境**: 開発・ステージング・本番
 
 ### 開発ツール
-- **パッケージマネージャー**: pnpm
-- **リンター**: ESLint
-- **フォーマッター**: Prettier
-- **Git hooks**: Husky + lint-staged
-- **テスト**: Jest + React Testing Library + Vitest
+- **パッケージマネージャー**: npm (Volta管理)
+- **ランタイム管理**: Volta (Node.js 24.12.0)
+- **リンター**: ESLint 9
+- **テスト**: Vitest 4 + React Testing Library 16+ + Playwright (E2E)
+- **パフォーマンス**: Web Vitals 5.1+ 統合
 
 ## アーキテクチャ設計
 
@@ -111,10 +118,10 @@ class SupabaseOmikujiResultRepository implements IOmikujiResultRepository {
 ```
 
 #### データ管理方針
-- 初期: `data/omikuji/`以下にJSONファイルで管理
-- おみくじ結果データはバージョン管理に含める
-- Repositoryインターフェースは変更せず、実装のみ差し替え
-- 依存性注入でRepository実装を切り替え可能に
+- 実装済み: `data/fortune/fortune-types.json` で運勢データ管理
+- API Routes (`/api/fortune/types`) でJSONデータを提供
+- クライアントサイドでのfetch統合とフォールバック機能
+- Repositoryパターンとドメイン層での型安全性確保
 
 ## パフォーマンス要件
 - First Contentful Paint: < 1.2秒
@@ -144,9 +151,11 @@ t-wadaのTDD手法に基づいた開発プロセスを採用。
 - **テストダブル**: モックよりもスタブを優先
 
 #### テストの種類
-1. **ユニットテスト**: ドメイン層、アプリケーション層
-2. **統合テスト**: インフラストラクチャ層、API Routes
-3. **E2Eテスト**: クリティカルなユーザーフロー（Playwright）
+1. **ユニットテスト**: ドメイン層（src/domain/**/*.test.ts）
+2. **コンポーネントテスト**: React Testing Library 16+ での各コンポーネント
+3. **統合テスト**: トップページ統合、API Routes、アクセシビリティ
+4. **E2Eテスト**: Playwright でクリティカルユーザーフロー
+5. **パフォーマンステスト**: Web Vitals自動測定
 
 ### コーディング規約
 - コミットメッセージ: Conventional Commits

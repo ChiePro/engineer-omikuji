@@ -1,9 +1,10 @@
 # プロジェクト構造
 
 ## 現在の状態
-- Next.jsボイラーテンプレートで初期化済み
-- 基本的な設定（ESLint, TypeScript等）は完了
-- Volta pinによるNode.js/pnpmバージョン管理設定済み
+- MVP実装完了（トップページ統合）
+- ドメイン層、インフラ層の基盤構築済み
+- API Routes とフロントエンド統合済み
+- 包括的テストスイート構築済み
 
 ## 主要ディレクトリ構成
 
@@ -43,13 +44,9 @@ enginer-omikuji/
 │   ├── types/            # 共通型定義
 │   └── styles/           # グローバルスタイル
 ├── public/               # 静的ファイル
-├── data/                # 初期データファイル
-│   └── omikuji/        # おみくじ結果データ
-│       ├── engineer-fortune.json    # エンジニア運勢
-│       ├── tech-selection.json      # 技術選定おみくじ
-│       ├── debug-fortune.json       # デバッグ運
-│       ├── review-fortune.json      # コードレビュー運
-│       └── deploy-fortune.json      # デプロイ運
+├── data/                # 実装済みデータファイル
+│   └── fortune/        # 運勢定義データ
+│       └── fortune-types.json     # 運勢タイプ（大吉〜大凶）
 ├── tests/               # テストファイル
 └── package.json         # プロジェクト設定
 ```
@@ -71,12 +68,13 @@ enginer-omikuji/
 ## APIエンドポイント設計
 
 ```
-/api/omikuji/
+/api/fortune/
+├── types/             # 実装済み：運勢タイプ一覧
+│   └── GET: => { fortunes: FortuneData[] }
+/api/omikuji/          # 将来実装
 ├── draw/              # おみくじを引く
 │   └── POST: { type: string } => { result: OmikujiResult }
-├── types/             # おみくじの種類一覧
-│   └── GET: => { types: OmikujiType[] }
-└── stats/             # 統計情報（将来的）
+└── stats/             # 統計情報
     └── GET: => { stats: Statistics }
 ```
 
@@ -103,9 +101,23 @@ interface OmikujiResult {
 }
 ```
 
-## 開発フロー
-1. `.kiro/specs/`に機能仕様を作成
-2. 仕様に基づいて実装
-3. PRを作成してレビュー
-4. mainブランチにマージ
-5. Vercelで自動デプロイ
+## 実装進捗
+### 完了済み（Phase 4.2）
+- **ドメイン層**: Fortune、Saisen、OmikujiType等の値オブジェクト・エンティティ
+- **インフラ層**: JSON Repository、API Routes
+- **プレゼンテーション層**: 統合されたトップページ（app/page.tsx）
+- **テスト基盤**: ユニット、統合、E2E、パフォーマンステスト
+
+### 実装パターン
+- **コンポーネント統合**: 個別コンポーネントをトップページに統合
+- **データフロー**: JSON → API Routes → Frontend fetch → React state
+- **型安全性**: TypeScript strict mode、ドメイン駆動設計
+- **アクセシビリティ**: ARIA属性、セマンティックHTML、自動テスト
+
+## 開発フロー  
+1. `.kiro/specs/`に機能仕様を作成（Spec-Driven Development）
+2. TDD：テストファースト実装
+3. Domain層 → Infrastructure層 → Presentation層の順で実装
+4. PRを作成してレビュー
+5. mainブランチにマージ
+6. Vercelで自動デプロイ

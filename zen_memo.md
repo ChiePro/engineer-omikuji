@@ -181,3 +181,9 @@ kiro/specs
 
 ```
 
+### spec-impl(実装)
+
+```
+> /kiro:spec-impl top-page 1
+```
+※ どうやら本来は、一度sessionをクリアした方がタスクの内容を忘れてくれるのでより忠実になるらしい

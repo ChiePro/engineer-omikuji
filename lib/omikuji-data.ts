@@ -49,4 +49,9 @@ export const omikujiList: readonly Omikuji[] = [
     name: 'バグ遭遇運',
     description: '今日のバグ発見確率を占います',
   },
+  {
+    id: 'deploy-luck',
+    name: 'デプロイ運',
+    description: 'デプロイの成功率を占います',
+  },
 ] as const;

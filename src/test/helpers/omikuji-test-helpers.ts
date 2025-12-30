@@ -1,5 +1,4 @@
 import { OmikujiType } from '../../domain/entities/OmikujiType'
-import { OmikujiTypeId } from '../../domain/valueObjects/OmikujiTypeId'
 import { OmikujiColorScheme } from '../../domain/valueObjects/OmikujiColorScheme'
 
 /**

@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -26,13 +26,13 @@ export function setupUserEvent() {
 /**
  * 非同期要素の待機ヘルパー
  */
-export async function waitForElement(callback: () => Promise<any>, timeout = 1000) {
+export async function waitForElement<T>(callback: () => Promise<T>, timeout = 1000): Promise<T> {
   const startTime = Date.now()
   
   while (Date.now() - startTime < timeout) {
     try {
       return await callback()
-    } catch (error) {
+    } catch {
       await new Promise(resolve => setTimeout(resolve, 50))
     }
   }

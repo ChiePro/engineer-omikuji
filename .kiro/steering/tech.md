@@ -3,7 +3,7 @@
 ## 技術スタック
 
 ### フロントエンド
-- **フレームワーク**: Next.js 14+ (App Router)
+- **フレームワーク**: Next.js 16 (App Router)
 - **言語**: TypeScript
 - **スタイリング**: Tailwind CSS
 - **アニメーション**: Framer Motion

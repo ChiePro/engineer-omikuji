@@ -16,7 +16,7 @@
     },
     "tasks": {
       "completed": true,
-      "approved": false
+      "approved": true
     },
     "implementation": {
       "completed": false

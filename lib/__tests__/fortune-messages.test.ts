@@ -2,7 +2,7 @@
  * 運勢メッセージのテスト
  *
  * タスク1.2の要件をテストする:
- * - 4種類のおみくじ×7段階の運勢=28パターンのメッセージが定義されていること
+ * - 1種類のおみくじ×7段階の運勢=7パターンのメッセージが定義されていること
  * - 各メッセージにおみくじID、運勢ID、メッセージ本文が存在すること
  * - メッセージはエンジニアの業務に関連した表現を含むこと
  * - 運勢レベルに応じた適切なトーンであること
@@ -14,12 +14,15 @@ import { fortuneMessages } from '../fortune-data';
 import { omikujiList } from '../omikuji-data';
 import { fortuneLevels } from '../fortune-data';
 
+// 従来のfortuneMessagesシステムを使用するおみくじのみをフィルタ
+const legacyOmikujiList = omikujiList.filter((o) => o.usesLegacySystem !== false);
+
 describe('運勢メッセージデータ', () => {
   describe('基本構造の検証', () => {
-    test('メッセージ配列が28要素（4おみくじ×7運勢）を持つこと', () => {
-      const expectedCount = omikujiList.length * fortuneLevels.length;
+    test('メッセージ配列が7要素（1おみくじ×7運勢）を持つこと', () => {
+      const expectedCount = legacyOmikujiList.length * fortuneLevels.length;
       expect(fortuneMessages).toHaveLength(expectedCount);
-      expect(fortuneMessages).toHaveLength(28);
+      expect(fortuneMessages).toHaveLength(7);
     });
 
     test('各メッセージが必須フィールド（omikujiId, fortuneId, message）を持つこと', () => {
@@ -38,7 +41,7 @@ describe('運勢メッセージデータ', () => {
 
   describe('データの完全性検証', () => {
     test('全てのおみくじIDと運勢IDの組み合わせに対してメッセージが存在すること', () => {
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         fortuneLevels.forEach((fortune) => {
           const message = fortuneMessages.find(
             (msg) => msg.omikujiId === omikuji.id && msg.fortuneId === fortune.id
@@ -50,7 +53,7 @@ describe('運勢メッセージデータ', () => {
     });
 
     test('各おみくじIDが正しく設定されていること', () => {
-      const omikujiIds = omikujiList.map((o) => o.id);
+      const omikujiIds = legacyOmikujiList.map((o) => o.id);
 
       fortuneMessages.forEach((msg) => {
         expect(omikujiIds).toContain(msg.omikujiId);
@@ -150,35 +153,6 @@ describe('運勢メッセージデータ', () => {
       const dailyLuckMessages = fortuneMessages.filter((msg) => msg.omikujiId === 'daily-luck');
 
       expect(dailyLuckMessages).toHaveLength(7); // 7段階の運勢
-    });
-
-    test('コードレビュー運（code-review）のメッセージがレビューに関連すること', () => {
-      const codeReviewMessages = fortuneMessages.filter(
-        (msg) => msg.omikujiId === 'code-review'
-      );
-
-      expect(codeReviewMessages).toHaveLength(7);
-
-      const messagesText = codeReviewMessages.map((msg) => msg.message).join(' ');
-      expect(messagesText).toMatch(/レビュー|指摘|承認|フィードバック/);
-    });
-
-    test('バグ遭遇運（bug-encounter）のメッセージがバグに関連すること', () => {
-      const bugMessages = fortuneMessages.filter((msg) => msg.omikujiId === 'bug-encounter');
-
-      expect(bugMessages).toHaveLength(7);
-
-      const messagesText = bugMessages.map((msg) => msg.message).join(' ');
-      expect(messagesText).toMatch(/バグ|エラー|問題|不具合/);
-    });
-
-    test('デプロイ運（deploy-luck）のメッセージがデプロイに関連すること', () => {
-      const deployMessages = fortuneMessages.filter((msg) => msg.omikujiId === 'deploy-luck');
-
-      expect(deployMessages).toHaveLength(7);
-
-      const messagesText = deployMessages.map((msg) => msg.message).join(' ');
-      expect(messagesText).toMatch(/デプロイ|リリース|本番/);
     });
   });
 

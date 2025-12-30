@@ -4,12 +4,15 @@
  * タスク2.2の要件をテストする:
  * - おみくじIDと運勢IDの組み合わせからメッセージを取得すること
  * - メッセージが見つからない場合は明確なエラーをスローすること
- * - 線形探索で実装すること（データ量が28件と少ないため十分）
+ * - 線形探索で実装すること（データ量が7件と少ないため十分）
  */
 
 import { getFortuneMessage } from '../fortune-message-getter';
 import { omikujiList } from '../omikuji-data';
 import { fortuneLevels } from '../fortune-data';
+
+// 従来のfortuneMessagesシステムを使用するおみくじのみをフィルタ
+const legacyOmikujiList = omikujiList.filter((o) => o.usesLegacySystem !== false);
 
 describe('運勢メッセージ取得機能', () => {
   describe('基本動作の検証', () => {
@@ -27,7 +30,7 @@ describe('運勢メッセージ取得機能', () => {
     });
 
     test('取得されたメッセージが空文字列ではないこと', () => {
-      const message = getFortuneMessage('code-review', 'kichi');
+      const message = getFortuneMessage('daily-luck', 'kichi');
 
       expect(message.trim()).not.toBe('');
     });
@@ -35,7 +38,7 @@ describe('運勢メッセージ取得機能', () => {
     test('異なる組み合わせで異なるメッセージが返されること', () => {
       const message1 = getFortuneMessage('daily-luck', 'daikichi');
       const message2 = getFortuneMessage('daily-luck', 'kichi');
-      const message3 = getFortuneMessage('code-review', 'daikichi');
+      const message3 = getFortuneMessage('daily-luck', 'chukichi');
 
       expect(message1).not.toBe(message2);
       expect(message1).not.toBe(message3);
@@ -44,8 +47,8 @@ describe('運勢メッセージ取得機能', () => {
   });
 
   describe('全てのパターンでの動作検証', () => {
-    test('全てのおみくじIDと運勢IDの組み合わせ（28パターン）でメッセージが取得できること', () => {
-      omikujiList.forEach((omikuji) => {
+    test('全てのおみくじIDと運勢IDの組み合わせ（7パターン）でメッセージが取得できること', () => {
+      legacyOmikujiList.forEach((omikuji) => {
         fortuneLevels.forEach((fortune) => {
           const message = getFortuneMessage(omikuji.id, fortune.id);
 
@@ -56,18 +59,18 @@ describe('運勢メッセージ取得機能', () => {
       });
     });
 
-    test('全28パターンのメッセージがユニークであること', () => {
+    test('全7パターンのメッセージがユニークであること', () => {
       const messages = new Set<string>();
 
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         fortuneLevels.forEach((fortune) => {
           const message = getFortuneMessage(omikuji.id, fortune.id);
           messages.add(message);
         });
       });
 
-      // 全28パターンが異なるメッセージであることを確認
-      expect(messages.size).toBe(28);
+      // 全7パターンが異なるメッセージであることを確認
+      expect(messages.size).toBe(7);
     });
   });
 
@@ -111,7 +114,7 @@ describe('運勢メッセージ取得機能', () => {
 
   describe('境界値の検証', () => {
     test('最初のおみくじIDと最初の運勢IDの組み合わせが正しく取得できること', () => {
-      const firstOmikuji = omikujiList[0];
+      const firstOmikuji = legacyOmikujiList[0];
       const firstFortune = fortuneLevels[0];
 
       const message = getFortuneMessage(firstOmikuji.id, firstFortune.id);
@@ -121,7 +124,7 @@ describe('運勢メッセージ取得機能', () => {
     });
 
     test('最後のおみくじIDと最後の運勢IDの組み合わせが正しく取得できること', () => {
-      const lastOmikuji = omikujiList[omikujiList.length - 1];
+      const lastOmikuji = legacyOmikujiList[legacyOmikujiList.length - 1];
       const lastFortune = fortuneLevels[fortuneLevels.length - 1];
 
       const message = getFortuneMessage(lastOmikuji.id, lastFortune.id);
@@ -148,7 +151,7 @@ describe('運勢メッセージ取得機能', () => {
 
       // 複数回実行
       for (let i = 0; i < 10; i++) {
-        getFortuneMessage('code-review', 'chukichi');
+        getFortuneMessage('daily-luck', 'chukichi');
       }
 
       // データが変更されていないことを確認

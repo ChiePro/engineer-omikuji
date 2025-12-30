@@ -3,7 +3,7 @@
  *
  * タスク5.1の要件をテストする:
  * - 既存のomikujiListの全てのIDに対して運勢抽選が成功すること
- * - 全28パターン（4おみくじ×7運勢）のメッセージが取得可能であること
+ * - 全7パターン（1おみくじ×7運勢）のメッセージが取得可能であること
  * - 不正なおみくじIDに対して適切にエラーハンドリングされること
  */
 
@@ -12,11 +12,14 @@ import { getFortuneMessage } from '../fortune-message-getter';
 import { omikujiList } from '../omikuji-data';
 import { fortuneLevels } from '../fortune-data';
 
+// 従来のfortuneMessagesシステムを使用するおみくじのみをフィルタ
+const legacyOmikujiList = omikujiList.filter((o) => o.usesLegacySystem !== false);
+
 describe('既存システムとの統合検証', () => {
   describe('既存のOmikuji型との統合', () => {
     test('既存のomikujiListの全てのIDに対して運勢抽選が成功すること', () => {
       // 全てのおみくじIDで運勢抽選を実行
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         expect(() => {
           const result = drawFortune(omikuji.id);
           expect(result).toBeDefined();
@@ -26,11 +29,11 @@ describe('既存システムとの統合検証', () => {
       });
     });
 
-    test('全28パターン（4おみくじ×7運勢）のメッセージが取得可能であること', () => {
+    test('全7パターン（1おみくじ×7運勢）のメッセージが取得可能であること', () => {
       const retrievedMessages = new Set<string>();
 
       // 全ての組み合わせでメッセージを取得
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         fortuneLevels.forEach((fortune) => {
           expect(() => {
             const message = getFortuneMessage(omikuji.id, fortune.id);
@@ -41,8 +44,8 @@ describe('既存システムとの統合検証', () => {
         });
       });
 
-      // 全28パターンが取得できたことを確認
-      expect(retrievedMessages.size).toBe(28);
+      // 全7パターンが取得できたことを確認
+      expect(retrievedMessages.size).toBe(7);
     });
 
     test('不正なおみくじIDに対して適切にエラーハンドリングされること', () => {
@@ -57,7 +60,7 @@ describe('既存システムとの統合検証', () => {
 
     test('全てのおみくじIDで全ての運勢レベルが選択可能であること', () => {
       // 各おみくじIDに対して、全ての運勢レベルのメッセージが取得できることを確認
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         const fortuneIdsForOmikuji = new Set<string>();
 
         // 全ての運勢レベルでメッセージ取得を試行
@@ -75,16 +78,17 @@ describe('既存システムとの統合検証', () => {
 
   describe('データ整合性の検証', () => {
     test('omikujiListの件数が正しいこと', () => {
-      expect(omikujiList).toHaveLength(4);
+      expect(omikujiList).toHaveLength(1); // 今日の運勢のみ
+      expect(legacyOmikujiList).toHaveLength(1); // 従来システムも1つ
     });
 
     test('fortuneLevelsの件数が正しいこと', () => {
       expect(fortuneLevels).toHaveLength(7);
     });
 
-    test('組み合わせの総数が28パターンであること', () => {
-      const totalPatterns = omikujiList.length * fortuneLevels.length;
-      expect(totalPatterns).toBe(28);
+    test('組み合わせの総数が7パターンであること', () => {
+      const totalPatterns = legacyOmikujiList.length * fortuneLevels.length;
+      expect(totalPatterns).toBe(7);
     });
   });
 
@@ -113,11 +117,11 @@ describe('既存システムとの統合検証', () => {
       expect(result.message.length).toBeLessThanOrEqual(150);
     });
 
-    test('複数のおみくじを順番に引くシナリオ', () => {
+    test('おみくじを引くシナリオ', () => {
       const results: Array<{ omikujiId: string; fortuneId: string }> = [];
 
-      // 4種類のおみくじを順番に引く
-      omikujiList.forEach((omikuji) => {
+      // おみくじを引く
+      legacyOmikujiList.forEach((omikuji) => {
         const result = drawFortune(omikuji.id);
         results.push({ omikujiId: omikuji.id, fortuneId: result.level.id });
 
@@ -126,8 +130,8 @@ describe('既存システムとの統合検証', () => {
         expect(result.message).toBeDefined();
       });
 
-      // 全ての結果が取得できたことを確認
-      expect(results).toHaveLength(4);
+      // 結果が取得できたことを確認
+      expect(results).toHaveLength(1);
     });
   });
 });

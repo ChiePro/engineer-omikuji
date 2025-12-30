@@ -11,6 +11,9 @@ import { drawFortune } from '../draw-fortune';
 import { omikujiList } from '../omikuji-data';
 import { fortuneLevels } from '../fortune-data';
 
+// 従来のfortuneMessagesシステムを使用するおみくじのみをフィルタ
+const legacyOmikujiList = omikujiList.filter((o) => o.usesLegacySystem !== false);
+
 describe('運勢抽選統合機能', () => {
   describe('基本動作の検証', () => {
     test('関数が存在すること', () => {
@@ -27,7 +30,7 @@ describe('運勢抽選統合機能', () => {
     });
 
     test('返される運勢レベルが正しい構造を持つこと', () => {
-      const result = drawFortune('code-review');
+      const result = drawFortune('daily-luck');
 
       expect(result.level).toHaveProperty('id');
       expect(result.level).toHaveProperty('name');
@@ -42,7 +45,7 @@ describe('運勢抽選統合機能', () => {
     });
 
     test('返されるメッセージが文字列であること', () => {
-      const result = drawFortune('bug-encounter');
+      const result = drawFortune('daily-luck');
 
       expect(typeof result.message).toBe('string');
       expect(result.message.length).toBeGreaterThan(0);
@@ -50,7 +53,7 @@ describe('運勢抽選統合機能', () => {
     });
 
     test('運勢レベルが7種類のいずれかであること', () => {
-      const result = drawFortune('deploy-luck');
+      const result = drawFortune('daily-luck');
       const fortuneIds = fortuneLevels.map((f) => f.id);
 
       expect(fortuneIds).toContain(result.level.id);
@@ -59,7 +62,7 @@ describe('運勢抽選統合機能', () => {
 
   describe('全おみくじタイプでの動作検証', () => {
     test('全てのおみくじIDで運勢抽選が成功すること', () => {
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         const result = drawFortune(omikuji.id);
 
         expect(result).toBeDefined();
@@ -69,7 +72,7 @@ describe('運勢抽選統合機能', () => {
     });
 
     test('各おみくじタイプで適切なメッセージが返されること', () => {
-      omikujiList.forEach((omikuji) => {
+      legacyOmikujiList.forEach((omikuji) => {
         const result = drawFortune(omikuji.id);
 
         // メッセージが空ではないこと
@@ -127,7 +130,7 @@ describe('運勢抽選統合機能', () => {
 
     test('同じおみくじIDで複数回実行しても正しい結果が返されること', () => {
       for (let i = 0; i < 10; i++) {
-        const result = drawFortune('code-review');
+        const result = drawFortune('daily-luck');
 
         expect(result).toBeDefined();
         expect(result.level).toBeDefined();
@@ -156,7 +159,7 @@ describe('運勢抽選統合機能', () => {
     });
 
     test('結果オブジェクトが既存のOmikuji型と統合可能な構造であること', () => {
-      const result = drawFortune('bug-encounter');
+      const result = drawFortune('daily-luck');
 
       // FortuneResultの構造を検証
       expect(result).toMatchObject({
@@ -174,7 +177,7 @@ describe('運勢抽選統合機能', () => {
   describe('パフォーマンスの検証', () => {
     test('1,000回連続実行しても正常に動作すること', () => {
       for (let i = 0; i < 1000; i++) {
-        const result = drawFortune('deploy-luck');
+        const result = drawFortune('daily-luck');
         expect(result).toBeDefined();
       }
     });

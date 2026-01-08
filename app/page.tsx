@@ -8,6 +8,9 @@
 'use client';
 
 import React from 'react';
+import { OmikujiAnimation } from '@/features/omikuji/components/OmikujiAnimation';
+import { Fortune } from '@/domain/valueObjects/Fortune';
+import { OmikujiType } from '@/domain/entities/OmikujiType';
 
 // JSONデータベースを使った運勢プレビューコンポーネント
 const RarityPreview = () => {
@@ -102,49 +105,55 @@ const SaisenSelector = () => (
   </div>
 );
 
-const OmikujiTypeGrid = () => {
-  const omikujiTypes = [
-    { 
-      id: 'engineer-fortune', 
-      name: 'エンジニア運勢', 
-      description: '今日のコーディングを占う', 
-      icon: '⚡',
-      color: { primary: '#6366f1', secondary: '#4f46e5' }
-    },
-    { 
-      id: 'tech-selection', 
-      name: '技術選定おみくじ', 
-      description: '次に学ぶ技術を決める', 
-      icon: '🎲',
-      color: { primary: '#8b5cf6', secondary: '#7c3aed' }
-    },
-    { 
-      id: 'debug-fortune', 
-      name: 'デバッグ運', 
-      description: 'バグ解決のヒントを得る', 
-      icon: '🐛',
-      color: { primary: '#10b981', secondary: '#059669' }
-    },
-    { 
-      id: 'code-review-fortune', 
-      name: 'コードレビュー運', 
-      description: 'レビューの結果を予想', 
-      icon: '👀',
-      color: { primary: '#f59e0b', secondary: '#d97706' }
-    },
-    { 
-      id: 'deploy-fortune', 
-      name: 'デプロイ運', 
-      description: 'デプロイの成功を占う', 
-      icon: '🚀',
-      color: { primary: '#ef4444', secondary: '#dc2626' }
-    }
-  ];
+// OmikujiFlowで使用するおみくじタイプのデータ
+const omikujiTypes = [
+  {
+    id: 'engineer-fortune',
+    name: 'エンジニア運勢',
+    description: '今日のコーディングを占う',
+    icon: '⚡',
+    color: { primary: '#6366f1', secondary: '#4f46e5' }
+  },
+  {
+    id: 'tech-selection',
+    name: '技術選定おみくじ',
+    description: '次に学ぶ技術を決める',
+    icon: '🎲',
+    color: { primary: '#8b5cf6', secondary: '#7c3aed' }
+  },
+  {
+    id: 'debug-fortune',
+    name: 'デバッグ運',
+    description: 'バグ解決のヒントを得る',
+    icon: '🐛',
+    color: { primary: '#10b981', secondary: '#059669' }
+  },
+  {
+    id: 'code-review-fortune',
+    name: 'コードレビュー運',
+    description: 'レビューの結果を予想',
+    icon: '👀',
+    color: { primary: '#f59e0b', secondary: '#d97706' }
+  },
+  {
+    id: 'deploy-fortune',
+    name: 'デプロイ運',
+    description: 'デプロイの成功を占う',
+    icon: '🚀',
+    color: { primary: '#ef4444', secondary: '#dc2626' }
+  }
+];
 
+const OmikujiTypeGrid = () => {
   const [isDrawing, setIsDrawing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [result, setResult] = React.useState<any>(null);
   const [showResult, setShowResult] = React.useState(false);
+  const [showAnimation, setShowAnimation] = React.useState(false);
+  const [animationData, setAnimationData] = React.useState<{
+    fortune: Fortune;
+    omikujiType: OmikujiType;
+  } | null>(null);
 
   const handleCardSelect = async (typeId: string) => {
     try {
@@ -157,7 +166,7 @@ const OmikujiTypeGrid = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          omikujiType: typeId,
+          typeId,
           monetaryAmount: 0,
         }),
       });
@@ -168,21 +177,74 @@ const OmikujiTypeGrid = () => {
         throw new Error(data.error?.message || 'おみくじを引くことができませんでした');
       }
 
-      setResult(data.result);
-      setShowResult(true);
-      
+      // APIレスポンスからドメインエンティティを作成
+      const apiResult = data.data;
+      const fortune = Fortune.fromData({
+        id: apiResult.fortune.id,
+        englishName: apiResult.fortune.englishName,
+        japaneseName: apiResult.fortune.japaneseName,
+        description: apiResult.fortune.description,
+        value: apiResult.fortune.value,
+        probability: apiResult.fortune.probability,
+        color: apiResult.fortune.color || {
+          primary: '#000000',
+          secondary: '#666666',
+          background: '#ffffff'
+        },
+        effects: apiResult.fortune.effects || {
+          glow: false,
+          sparkle: false,
+          animation: null
+        }
+      });
+
+      const omikujiType = OmikujiType.create({
+        id: apiResult.omikujiType.id,
+        name: apiResult.omikujiType.name,
+        description: apiResult.omikujiType.description,
+        icon: apiResult.omikujiType.icon,
+        color: {
+          primary: apiResult.omikujiType.color.primary,
+          secondary: apiResult.omikujiType.color.secondary
+        },
+        sortOrder: 0
+      });
+
+      setResult(data);
+      setAnimationData({ fortune, omikujiType });
+      setIsDrawing(false);
+      setShowAnimation(true);
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'おみくじを引くことができませんでした';
       setError(errorMessage);
-    } finally {
       setIsDrawing(false);
     }
+  };
+
+  const handleAnimationComplete = () => {
+    setShowAnimation(false);
+    setShowResult(true);
   };
 
   const handleCloseResult = () => {
     setShowResult(false);
     setResult(null);
+    setAnimationData(null);
   };
+
+  // アニメーション表示中
+  if (showAnimation && animationData) {
+    return (
+      <div className="min-h-[750px]">
+        <OmikujiAnimation
+          fortune={animationData.fortune}
+          omikujiType={animationData.omikujiType}
+          onComplete={handleAnimationComplete}
+        />
+      </div>
+    );
+  }
 
   if (showResult && result) {
     return (
@@ -195,54 +257,60 @@ const OmikujiTypeGrid = () => {
           >
             ×
           </button>
-          
+
           {/* 運勢結果 */}
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🎊</div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {result.fortune.name}
+              {result.data.fortune.japaneseName}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {result.fortune.description}
+              {result.data.fortune.description}
             </p>
           </div>
 
           {/* タイトルフレーズ */}
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 text-center">
-              今日のメッセージ
-            </h3>
-            <p className="text-lg text-gray-800 dark:text-gray-200 text-center leading-relaxed">
-              {result.omikujiResult.titlePhrase.value}
-            </p>
-          </div>
+          {result.result?.omikujiResult?.titlePhrase?.value && (
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 text-center">
+                今日のメッセージ
+              </h3>
+              <p className="text-lg text-gray-800 dark:text-gray-200 text-center leading-relaxed">
+                {result.result.omikujiResult.titlePhrase.value}
+              </p>
+            </div>
+          )}
 
           {/* 説明 */}
-          <div className="mb-6">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {result.omikujiResult.description.value}
-            </p>
-          </div>
+          {result.result?.omikujiResult?.description?.value && (
+            <div className="mb-6">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                {result.result.omikujiResult.description.value}
+              </p>
+            </div>
+          )}
 
           {/* カテゴリ別運勢 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {result.omikujiResult.categories.items.map((category: any, index: number) => (
-              <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div className="flex items-center mb-2">
-                  <div className={`w-3 h-3 rounded-full mr-2 ${
-                    category.emotionTone === 'positive' ? 'bg-green-400' :
-                    category.emotionTone === 'negative' ? 'bg-red-400' : 'bg-yellow-400'
-                  }`}></div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white">
-                    {category.name}
-                  </h4>
+          {result.result?.omikujiResult?.categories?.items && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {result.result.omikujiResult.categories.items.map((category: any, index: number) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${
+                      category.emotionTone === 'positive' ? 'bg-green-400' :
+                      category.emotionTone === 'negative' ? 'bg-red-400' : 'bg-yellow-400'
+                    }`}></div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                      {category.name}
+                    </h4>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {category.content}
+                  </p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {category.content}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* アクションボタン */}
           <div className="flex gap-4 justify-center">
@@ -283,7 +351,7 @@ const OmikujiTypeGrid = () => {
           </button>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {omikujiTypes.map((type) => (
           <div

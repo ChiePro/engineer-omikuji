@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OmikujiCard } from './OmikujiCard/OmikujiCard';
 import { OmikujiResultDisplay } from './OmikujiResultDisplay';
 import { OmikujiLoadingIndicator } from './OmikujiLoadingIndicator/OmikujiLoadingIndicator';
+import { OmikujiAnimation } from './OmikujiAnimation';
 import { SmoothTransitions } from '@/animations/transitions/SmoothTransitions';
 import { OmikujiResult } from '@/domain/entities/OmikujiResult';
 import { OmikujiType } from '@/domain/entities/OmikujiType';
@@ -61,7 +62,7 @@ interface OmikujiFlowProps {
   onError?: (error: string) => void;
 }
 
-type FlowState = 'selection' | 'transitioning' | 'loading' | 'result' | 'error';
+type FlowState = 'selection' | 'transitioning' | 'loading' | 'animation' | 'result' | 'error';
 
 // Helper function to convert API response to domain entities
 function convertApiResultToDomain(apiResult: ApiOmikujiResult): OmikujiResult {
@@ -149,10 +150,10 @@ export function OmikujiFlow({
       // Convert API response to domain entities
       const apiResult = data.data as ApiOmikujiResult;
       const domainResult = convertApiResultToDomain(apiResult);
-      
+
+      // API結果をキャッシュし、アニメーション開始
       setResult(domainResult);
-      setFlowState('result');
-      onFlowComplete?.(domainResult);
+      setFlowState('animation');
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'おみくじを引くことができませんでした';
@@ -188,6 +189,14 @@ export function OmikujiFlow({
   const handleResultClose = useCallback(() => {
     handleRedraw();
   }, [handleRedraw]);
+
+  // アニメーション完了時のコールバック
+  const handleAnimationComplete = useCallback(() => {
+    setFlowState('result');
+    if (result) {
+      onFlowComplete?.(result);
+    }
+  }, [result, onFlowComplete]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -286,6 +295,23 @@ export function OmikujiFlow({
             <OmikujiLoadingIndicator
               message={flowState === 'transitioning' ? '遷移中...' : 'おみくじを引いています...'}
               size="large"
+            />
+          </motion.div>
+        )}
+
+        {flowState === 'animation' && result && (
+          <motion.div
+            key={`animation-${result.getId()}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="animation-state min-h-[750px]"
+          >
+            <OmikujiAnimation
+              key={result.getId()}
+              fortune={result.getFortune()}
+              omikujiType={result.getOmikujiType()}
+              onComplete={handleAnimationComplete}
             />
           </motion.div>
         )}

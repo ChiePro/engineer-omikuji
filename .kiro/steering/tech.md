@@ -44,26 +44,33 @@ Eric EvansのDomain Driven Designに基づいたクリーンアーキテクチ�
 
 ### ディレクトリ構造
 ```
+app/                      # Next.js App Router（プレゼンテーション層）
+├── api/                  # APIルート
+├── components/           # App Router用コンポーネント
+├── features/             # App Router用機能コンポーネント
+└── lib/                  # App Router用ライブラリ
 src/
-├── app/                    # Next.js App Router（プレゼンテーション層）
-├── components/            # 再利用可能なUIコンポーネント
 ├── domain/               # ドメイン層（ビジネスロジック）
 │   ├── entities/         # エンティティ
 │   ├── valueObjects/     # 値オブジェクト
 │   ├── repositories/     # リポジトリインターフェース
-│   └── services/         # ドメインサービス
-├── application/          # アプリケーション層
-│   └── useCases/        # ユースケース
+│   ├── services/         # ドメインサービス
+│   └── errors/           # ドメインエラー
 ├── infrastructure/       # インフラストラクチャ層
 │   ├── repositories/     # リポジトリ実装
 │   └── external/         # 外部サービス連携
 ├── features/             # 機能別のプレゼンテーション層
 │   ├── omikuji/         # おみくじ機能UI
-│   └── share/           # シェア機能UI
+│   └── motivation/      # モチベーション機能UI
+├── animations/          # アニメーション機能
+├── design-system/       # デザインシステム
 ├── lib/                  # ユーティリティ関数
 ├── hooks/               # カスタムフック
 ├── types/               # 共通TypeScript型定義
-└── styles/              # グローバルスタイル
+└── test/                # テストヘルパー
+data/
+├── fortune/             # 運勢定義データ
+└── results/             # おみくじ結果データ（5種類）
 ```
 
 ### データフロー（クリーンアーキテクチャ）
@@ -76,21 +83,27 @@ src/
 ### DDD設計
 
 #### エンティティ
-- `Omikuji`: おみくじエンティティ（ID、結果、レアリティを持つ）
-- `OmikujiSession`: おみくじセッション（お賽銭情報を保持）
+- `OmikujiType`: おみくじの種類（ID、名前、説明、アイコンを持つ）
+- `OmikujiResult`: おみくじ結果（ID、運勢、コンテンツ、感情属性を持つ）
+- `SaisenSession`: お賽銭セッション（お賽銭情報を保持）
 
 #### 値オブジェクト
-- `OmikujiType`: おみくじの種類
+- `Fortune`: 運勢（大吉、中吉、小吉、吉、末吉、凶、大凶）
 - `Rarity`: レアリティ（Common, Rare, Epic, Legendary）
-- `Fortune`: 運勢（大吉、吉、中吉、小吉、末吉、凶）
 - `Saisen`: お賽銭金額
+- `EmotionAttribute`: 感情属性（positive/neutral/challenging）
+- `FortuneCategory`: 運勢カテゴリ（仕事運、恋愛運、金運など）
+- `TitlePhrase`: おみくじのタイトルフレーズ
+- `Description`: おみくじの説明テキスト
 
 #### ドメインサービス
-- `OmikujiDrawService`: おみくじ抽選ロジック
-- `RarityCalculator`: レアリティ計算サービス
+- `OmikujiDrawService`: おみくじ抽選ロジック（感情属性ベースのランダム化）
+- `RarityCalculatorService`: レアリティ計算サービス
+- `SaisenEffectCalculatorService`: お賽銭効果計算サービス
+- `EmotionAttributeCalculator`: 感情属性計算サービス
+- `OmikujiTypeService`: おみくじ種類管理サービス
 
 #### リポジトリインターフェース
-- `IOmikujiRepository`: おみくじデータの永続化インターフェース
 - `IOmikujiResultRepository`: おみくじ結果の取得インターフェース
 
 ### データアクセス層の設計

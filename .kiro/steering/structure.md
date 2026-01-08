@@ -110,7 +110,7 @@ interface OmikujiResult {
 - **テスト基盤**: ユニット、統合、E2E、パフォーマンス、アクセシビリティテスト
 
 ### 完了済み仕様（.kiro/specs/）
-- top-page, fortune-system, saisen-system, omikuji-results, fortune-randomization
+- top-page, fortune-system, saisen-system, omikuji-results, fortune-randomization, omikuji-animation
 
 ### 実装パターン
 - **コンポーネント統合**: 個別コンポーネントをトップページに統合

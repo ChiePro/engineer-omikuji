@@ -18,21 +18,30 @@ Next.js App Router のファイルベースルーティングに従った構成�
 **Location**: `/lib/`
 **Purpose**: データ定義、ビジネスロジック、ユーティリティ関数
 **Pattern**: データ層とロジック層を分離し、型安全な実装を提供
-**Example**:
+
+**Core Fortune System**:
 - `fortune-data.ts`: 運勢レベルとメッセージのマスターデータ（イミュータブル、`as const`）
 - `fortune-selector.ts`: 重み付き確率分布によるランダム選択ロジック
+- `fortune-message-getter.ts`: メッセージ取得ロジック
 - `draw-fortune.ts`: 統合関数（データ + ロジック）
-- `__tests__/`: テストファイル（実装と同階層）
+
+**Integrated Fortune System** (将来展開):
+- `category-data.ts`: 6カテゴリ定義とメッセージプール（positive/negative各5、計60パターン）
+- `overall-fortune-data.ts`: 総合運勢メッセージ（7レベル×5パターン=35メッセージ）
+- `category-selector.ts`: 確率的カテゴリアドバイス選択（運勢レベルに応じた分布: 95%→5%）
+- `integrated-fortune.ts`: 統合運勢抽選（総合運勢 + 6カテゴリアドバイス）
 
 **Testing Pattern**:
+- `__tests__/`: テストファイル（実装と同階層）
 - TDD (Test-Driven Development) で実装
 - ユニットテスト、統合テスト、パフォーマンステストを網羅
 - 純粋関数として実装し、副作用なし、テスト可能性を確保
 
-### Future Patterns (想定)
-**Location**: `/app/components/` または `/components/`
+### Components Directory
+**Location**: `/app/components/`
 **Purpose**: 再利用可能なUIコンポーネント
-**Example**: おみくじ表示、結果カードなど
+**Example**:
+- `OmikujiCard.tsx`: おみくじカード表示コンポーネント
 
 ## Naming Conventions
 

@@ -13,41 +13,39 @@ enginer-omikuji/
 ├── .kiro/                    # Kiro SDD関連
 │   ├── steering/            # プロジェクトステアリング
 │   └── specs/              # 機能仕様
-├── src/                     # ソースコード
-│   ├── app/                # Next.js App Router（プレゼンテーション層）
-│   │   ├── layout.tsx      # ルートレイアウト
-│   │   ├── page.tsx        # ホームページ
-│   │   ├── api/           # APIルート
-│   │   └── omikuji/       # おみくじページ
+├── app/                     # Next.js App Router（プレゼンテーション層）
+│   ├── layout.tsx          # ルートレイアウト
+│   ├── page.tsx            # ホームページ
+│   ├── api/               # APIルート
+│   │   ├── fortune/types/ # 運勢タイプAPI
+│   │   └── omikuji/draw/  # おみくじ抽選API
+│   ├── components/        # App Router用コンポーネント
+│   ├── features/          # App Router用機能コンポーネント
+│   └── lib/              # App Router用ライブラリ
+├── src/                     # ソースコード（ドメイン・インフラ層）
 │   ├── domain/            # ドメイン層（ビジネスロジック）
 │   │   ├── entities/      # エンティティ
 │   │   ├── valueObjects/  # 値オブジェクト
 │   │   ├── repositories/  # リポジトリインターフェース
-│   │   └── services/      # ドメインサービス
-│   ├── application/       # アプリケーション層
-│   │   └── useCases/     # ユースケース
+│   │   ├── services/      # ドメインサービス
+│   │   └── errors/        # ドメインエラー
 │   ├── infrastructure/    # インフラストラクチャ層
 │   │   ├── repositories/  # リポジトリ実装
 │   │   │   └── json/     # JSON実装
 │   │   └── external/      # 外部サービス連携
-│   ├── components/        # 共通UIコンポーネント
-│   │   ├── ui/           # 基本UIコンポーネント
-│   │   └── layout/       # レイアウトコンポーネント
 │   ├── features/          # 機能別プレゼンテーション層
 │   │   ├── omikuji/      # おみくじ機能UI
-│   │   │   ├── components/
-│   │   │   ├── hooks/
-│   │   │   └── types.ts
-│   │   └── share/        # シェア機能UI
+│   │   └── motivation/   # モチベーション機能UI
+│   ├── animations/        # アニメーション機能
+│   ├── design-system/    # デザインシステム（色、間隔、トークン）
 │   ├── lib/              # 共通ライブラリ
 │   ├── hooks/            # 共通カスタムフック
 │   ├── types/            # 共通型定義
-│   └── styles/           # グローバルスタイル
-├── public/               # 静的ファイル
+│   └── test/             # テストヘルパー・テストファイル
 ├── data/                # 実装済みデータファイル
-│   └── fortune/        # 運勢定義データ
-│       └── fortune-types.json     # 運勢タイプ（大吉〜大凶）
-├── tests/               # テストファイル
+│   ├── fortune/        # 運勢定義データ
+│   └── results/        # おみくじ結果データ（5種類）
+├── public/               # 静的ファイル
 └── package.json         # プロジェクト設定
 ```
 
@@ -71,10 +69,10 @@ enginer-omikuji/
 /api/fortune/
 ├── types/             # 実装済み：運勢タイプ一覧
 │   └── GET: => { fortunes: FortuneData[] }
-/api/omikuji/          # 将来実装
-├── draw/              # おみくじを引く
-│   └── POST: { type: string } => { result: OmikujiResult }
-└── stats/             # 統計情報
+/api/omikuji/
+├── draw/              # 実装済み：おみくじを引く
+│   └── POST: { type: string, saisen?: number } => { result: OmikujiResult }
+└── stats/             # 将来実装：統計情報
     └── GET: => { stats: Statistics }
 ```
 
@@ -102,17 +100,24 @@ interface OmikujiResult {
 ```
 
 ## 実装進捗
-### 完了済み（Phase 4.2）
-- **ドメイン層**: Fortune、Saisen、OmikujiType等の値オブジェクト・エンティティ
-- **インフラ層**: JSON Repository、API Routes
-- **プレゼンテーション層**: 統合されたトップページ（app/page.tsx）
-- **テスト基盤**: ユニット、統合、E2E、パフォーマンステスト
+### 完了済み機能
+- **ドメイン層**: Fortune、Saisen、OmikujiType、OmikujiResult、EmotionAttribute等の値オブジェクト・エンティティ
+- **ドメインサービス**: OmikujiDrawService、EmotionAttributeCalculator、RarityCalculatorService
+- **インフラ層**: JSON Repository、API Routes（fortune/types、omikuji/draw）
+- **プレゼンテーション層**: 統合されたトップページ（app/page.tsx）、OmikujiFlow
+- **デザインシステム**: ShrineColorPalette、ShrineSpacing、ShrineDesignTokens
+- **アニメーション**: MysteriousAppearance、SmoothTransitions、HoverEffects
+- **テスト基盤**: ユニット、統合、E2E、パフォーマンス、アクセシビリティテスト
+
+### 完了済み仕様（.kiro/specs/）
+- top-page, fortune-system, saisen-system, omikuji-results, fortune-randomization
 
 ### 実装パターン
 - **コンポーネント統合**: 個別コンポーネントをトップページに統合
 - **データフロー**: JSON → API Routes → Frontend fetch → React state
 - **型安全性**: TypeScript strict mode、ドメイン駆動設計
 - **アクセシビリティ**: ARIA属性、セマンティックHTML、自動テスト
+- **おみくじ抽選**: 感情属性ベースのランダム化でコンテンツ一貫性を確保
 
 ## 開発フロー  
 1. `.kiro/specs/`に機能仕様を作成（Spec-Driven Development）

@@ -3,6 +3,15 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import userEvent from '@testing-library/user-event';
 import { OmikujiFlow } from './OmikujiFlow';
 
+// Mock OmikujiAnimation to immediately complete
+vi.mock('./OmikujiAnimation', () => ({
+  OmikujiAnimation: ({ onComplete }: { onComplete: () => void }) => {
+    // Immediately call onComplete to skip animation
+    setTimeout(() => onComplete(), 0);
+    return <div data-testid="omikuji-animation">Animation</div>;
+  }
+}));
+
 // Mock the API call
 const mockApiResponse = {
   success: true,
